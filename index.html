@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抖音私信跳转企业微信工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        h1 {
+            color: #ff0050;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2575fc;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #2575fc;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+        }
+        
+        .btn {
+            background: #ff0050;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            background: #e00046;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 0, 80, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6a11cb;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a0db5;
+        }
+        
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f4ff;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2575fc;
+        }
+        
+        #generatedLink {
+            word-break: break-all;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            border: 1px dashed #2575fc;
+        }
+        
+        .qrcode-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            background: white;
+            position: relative;
+        }
+        
+        .qrcode-placeholder {
+            text-align: center;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #6a11cb;
+            margin-bottom: 15px;
+        }
+        
+        #qrcodeImage {
+            max-width: 100%;
+            max-height: 250px;
+            display: none;
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f8ff;
+            border-radius: 15px;
+        }
+        
+        .instructions h3 {
+            color: #ff0050;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .steps {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .step {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-number {
+            background: #6a11cb;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .github-link {
+            color: #6a11cb;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .github-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-tiktok"></i>抖音私信跳转企业微信工具</h1>
+            <p class="subtitle">输入抖音用户ID生成私信链接，展示企业微信二维码，快速引导客户添加企业微信</p>
+        </header>
+        
+        <div class="content">
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-link"></i>
+                    <h2>生成抖音私信链接</h2>
+                </div>
+                
+                <div class="input-group">
+                    <label for="userId"><i class="fas fa-user"></i> 抖音用户ID</label>
+                    <input type="text" id="userId" placeholder="例如: 1234567890" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="prefilledMessage"><i class="fas fa-comment"></i> 预填消息 (可选)</label>
+                    <input type="text" id="prefilledMessage" placeholder="例如: 您好，我想咨询产品">
+                </div>
+                
+                <button class="btn" onclick="generateLink()">
+                    <i class="fas fa-bolt"></i> 生成私信链接
+                </button>
+                
+                <div class="result-box" id="resultBox">
+                    <div class="result-title"><i class="fas fa-paper-plane"></i> 生成的私信链接：</div>
+                    <div id="generatedLink">链接将在这里显示</div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-qrcode"></i>
+                    <h2>企业微信二维码</h2>
+                </div>
+                
+                <div class="qrcode-container" id="qrcodeContainer">
+                    <div class="qrcode-placeholder">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <p>上传企业微信二维码图片</p>
+                        <p style="font-size: 0.9rem; margin-top: 5px;">支持 JPG, PNG 格式</p>
+                    </div>
+                    <img id="qrcodeImage" alt="企业微信二维码">
+                </div>
+                
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                
+                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-upload"></i> 上传二维码
+                </button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <p>在左侧输入抖音用户ID（可在抖音个人主页获取）</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <p>上传您的企业微信二维码图片</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <p>复制生成的链接，发送给客户点击即可跳转</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>本工具完全在浏览器中运行，无需服务器支持</p>
+            <p>部署在GitHub Pages | © 2023 抖音私信跳转工具</p>
+            <a href="#" class="github-link">
+                <i class="fab fa-github"></i> 查看GitHub仓库
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        // 生成抖音私信链接
+        function generateLink() {
+            const userId = document.getElementById('userId').value.trim();
+            const message = document.getElementById('prefilledMessage').value.trim();
+            
+            if (!userId) {
+                alert('请输入抖音用户ID');
+                return;
+            }
+            
+            // 构建抖音私信链接
+            let douyinUrl = `https://www.douyin.com/message/?to_user_id=${encodeURIComponent(userId)}`;
+            
+            // 添加预填消息（如果提供）
+            if (message) {
+                douyinUrl += `&enter_from=others&enter_method=chat&preview_type=popup&prefill_content=${encodeURIComponent(message)}`;
+            }
+            
+            // 显示结果
+            document.getElementById('generatedLink').textContent = douyinUrl;
+            document.getElementById('resultBox').style.display = 'block';
+        }
+        
+        // 处理二维码上传
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('请选择图片文件 (JPG, PNG)');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const qrcodeImage = document.getElementById('qrcodeImage');
+                qrcodeImage.src = e.target.result;
+                qrcodeImage.style.display = 'block';
+                document.querySelector('.qrcode-placeholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            // 可以在这里添加初始化逻辑
+        };
+    </script>
+</body>
+</html>
